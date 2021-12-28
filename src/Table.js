@@ -27,9 +27,9 @@ export default function DataTable({ columns, rows }) {
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                         <TableRow>
-                            {columns.map((column) => (
+                            {columns.map((column, index) => (
                                 <TableCell
-                                    key={column.id}
+                                    key={index}
                                     align={column.align}
                                     style={{ minWidth: column.minWidth }}
                                 >
@@ -44,19 +44,19 @@ export default function DataTable({ columns, rows }) {
                                 page * rowsPerPage,
                                 page * rowsPerPage + rowsPerPage
                             )
-                            .map((row) => {
+                            .map((row, rowIdx) => {
                                 return (
                                     <TableRow
                                         hover
                                         role="checkbox"
                                         tabIndex={-1}
-                                        key={row.code}
+                                        key={`${rowIdx}`}
                                     >
-                                        {columns.map((column) => {
+                                        {columns.map((column, colIdx) => {
                                             const value = row[column.id];
                                             return (
                                                 <TableCell
-                                                    key={column.id}
+                                                    key={colIdx}
                                                     align={column.align}
                                                 >
                                                     {column.format
