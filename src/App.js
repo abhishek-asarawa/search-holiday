@@ -1,25 +1,91 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import DataTable from "./Table";
+import { isArray, isObject, map, reduce } from "lodash";
+
+const columns = [
+    {
+        id: "title",
+        minWidth: 170,
+        align: "left",
+        format: (value) => value,
+        name: "Name",
+    },
+    {
+        id: "date",
+        minWidth: 170,
+        align: "left",
+        format: (value) => value,
+        name: "Date",
+    },
+    {
+        id: "division",
+        minWidth: 170,
+        align: "left",
+        format: (value) => value,
+        name: "Division",
+    },
+    {
+        id: "notes",
+        minWidth: 170,
+        align: "left",
+        format: (value) => value,
+        name: "Notes",
+    },
+];
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [data, setData] = useState([]);
+
+    const fetchData = useCallback(async () => {
+        try {
+            const response = await axios.get(
+                "https://www.gov.uk/bank-holidays.json"
+            );
+
+            const result = response.data;
+
+            setData(
+                reduce(
+                    result,
+                    (agg, value) => {
+                        const { events, division } = value;
+                        if (isArray(events))
+                            return [
+                                ...agg,
+                                ...map(events, (event) =>
+                                    isObject(event)
+                                        ? {
+                                              ...event,
+                                              timestamp: new Date(event.date),
+                                              division,
+                                          }
+                                        : {}
+                                ),
+                            ];
+
+                        return [...agg];
+                    },
+                    []
+                )
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {}, [data]);
+
+    return (
+        <div className="App">
+            <DataTable rows={data} columns={columns} />
+        </div>
+    );
 }
 
 export default App;
