@@ -126,7 +126,7 @@ function App() {
         <div className="App">
             <Toolbar
                 handleCustom={handleCustom}
-                isCustomTime={custom.isCustom}
+                custom={custom}
                 handleReset={resetCustom}
             />
             <DataTable rows={filtered} columns={columns} />

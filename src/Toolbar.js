@@ -2,6 +2,12 @@ import * as React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import DateModal from "./DateModal";
+
+const convertTimeDate = (date) => {
+    const dateOptions = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(date).toLocaleDateString("en-GB", dateOptions);
+};
 
 const handleYesterday = () => {
     const currDate = new Date();
@@ -62,8 +68,13 @@ const handleToday = () => {
     return { endDate: endDate - 1, startDate };
 };
 
-export default function Toolbar({ handleCustom, isCustomTime, handleReset }) {
+export default function Toolbar({ handleCustom, handleReset, custom }) {
     const [range, setRange] = React.useState("default");
+    const [open, setOpen] = React.useState(false);
+    const [shouldReset, setShouldReset] = React.useState(false);
+
+    const handleClose = () => setOpen(false);
+    const handleOpen = () => setOpen(true);
 
     const handleChange = (event) => {
         let endDate, startDate;
@@ -109,16 +120,26 @@ export default function Toolbar({ handleCustom, isCustomTime, handleReset }) {
                 break;
             }
 
+            case "custom": {
+                setRange(event.target.value);
+                break;
+            }
+
             default:
                 break;
         }
 
         if (startDate && endDate) {
-            // console.log(startDate, endDate);
             handleCustom(startDate, endDate, true);
             setRange(event.target.value);
         }
     };
+
+    React.useEffect(() => {
+        if (range === "custom") {
+            setShouldReset(true);
+        } else if (shouldReset) setShouldReset(false);
+    }, [range, shouldReset]);
 
     return (
         <div style={{ margin: "1%" }}>
@@ -142,9 +163,21 @@ export default function Toolbar({ handleCustom, isCustomTime, handleReset }) {
                     <MenuItem value="lastWeek">Last Week</MenuItem>
                     <MenuItem value="lastMonth">Last Month</MenuItem>
                     <MenuItem value="lastYear">Last Year</MenuItem>
-                    <MenuItem value="custom">Select Yourself</MenuItem>
+                    <MenuItem value="custom" onClick={handleOpen}>
+                        {custom.isCustom && range === "custom"
+                            ? `${convertTimeDate(
+                                  custom.startDate
+                              )} to ${convertTimeDate(custom.endDate)}`
+                            : "Select by Yourself"}
+                    </MenuItem>
                 </Select>
             </FormControl>
+            <DateModal
+                open={open}
+                handleClose={handleClose}
+                handleSubmit={(sd, ed) => handleCustom(sd, ed, true)}
+                shouldReset={shouldReset}
+            />
         </div>
     );
 }
