@@ -21,6 +21,10 @@ export default function DataTable({ columns, rows }) {
         setPage(0);
     };
 
+    React.useEffect(() => {
+        setPage(0);
+    }, [rows]);
+
     return (
         <Paper sx={{ margin: "2% 1%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 800 }}>

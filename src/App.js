@@ -55,6 +55,13 @@ function App() {
         setCustom((prev) => ({ ...prev, startDate, endDate, isCustom }));
     };
 
+    const resetCustom = () =>
+        setCustom({
+            startDate: getTimeStamp(),
+            endDate: getTimeStamp(),
+            isCustom: false,
+        });
+
     const fetchData = useCallback(async () => {
         try {
             const response = await axios.get(
@@ -100,17 +107,14 @@ function App() {
 
     useEffect(() => {
         const { isCustom, startDate, endDate } = custom;
+
         if (isCustom) {
             setFiltered(
                 filter(data, (event) => {
-                    if (
-                        startDate < event.timestamp &&
-                        event.timestamp < endDate
-                    )
-                        return (
-                            startDate <= event.timestamp &&
-                            event.timestamp <= endDate
-                        );
+                    return (
+                        startDate <= event.timestamp &&
+                        event.timestamp <= endDate
+                    );
                 })
             );
         } else {
@@ -118,19 +122,12 @@ function App() {
         }
     }, [custom, data]);
 
-    // useEffect(() => {
-    //     if (!isCustomTime && startDate !== endDate) {
-    //         console.log("resetting to default");
-    //         setStartDate(getTimeStamp());
-    //         setEndDate(getTimeStamp());
-    //     }
-    // }, [isCustomTime, startDate, endDate]);
-
     return (
         <div className="App">
             <Toolbar
                 handleCustom={handleCustom}
                 isCustomTime={custom.isCustom}
+                handleReset={resetCustom}
             />
             <DataTable rows={filtered} columns={columns} />
         </div>

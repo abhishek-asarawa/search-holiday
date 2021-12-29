@@ -49,8 +49,21 @@ const handleLastYear = () => {
     return { endDate: endDate - 1, startDate };
 };
 
-export default function Toolbar({ handleCustom, isCustomTime }) {
-    const [range, setRange] = React.useState(0);
+const handleToday = () => {
+    const currDate = new Date();
+    currDate.setHours(0, 0, 0, 0);
+
+    const startDate = currDate.getTime();
+
+    currDate.setDate(currDate.getDate() + 1);
+
+    const endDate = currDate.getTime();
+
+    return { endDate: endDate - 1, startDate };
+};
+
+export default function Toolbar({ handleCustom, isCustomTime, handleReset }) {
+    const [range, setRange] = React.useState("default");
 
     const handleChange = (event) => {
         let endDate, startDate;
@@ -84,6 +97,18 @@ export default function Toolbar({ handleCustom, isCustomTime }) {
                 break;
             }
 
+            case "today": {
+                const dates = handleToday();
+                startDate = dates.startDate;
+                endDate = dates.endDate;
+                break;
+            }
+
+            case "default": {
+                handleReset();
+                break;
+            }
+
             default:
                 break;
         }
@@ -107,14 +132,17 @@ export default function Toolbar({ handleCustom, isCustomTime }) {
                     label="Age"
                     sx={{ width: 350 }}
                 >
-                    <MenuItem value={0}>
-                        {range === 0 ? "Select Interval" : "Reset To Today"}
+                    <MenuItem value={"default"}>
+                        {range === "default"
+                            ? "Select Interval"
+                            : "Reset To Default"}
                     </MenuItem>
+                    <MenuItem value="today">Today</MenuItem>
                     <MenuItem value="yesterday">Yesterday</MenuItem>
                     <MenuItem value="lastWeek">Last Week</MenuItem>
                     <MenuItem value="lastMonth">Last Month</MenuItem>
                     <MenuItem value="lastYear">Last Year</MenuItem>
-                    <MenuItem value={0}>Custom Interval</MenuItem>
+                    <MenuItem value="custom">Select Yourself</MenuItem>
                 </Select>
             </FormControl>
         </div>
