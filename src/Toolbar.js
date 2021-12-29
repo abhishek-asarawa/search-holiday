@@ -116,12 +116,13 @@ export default function Toolbar({ handleCustom, handleReset, custom }) {
             }
 
             case "default": {
+                setRange("default");
                 handleReset();
                 break;
             }
 
             case "custom": {
-                setRange(event.target.value);
+                setRange("custom");
                 break;
             }
 
@@ -150,7 +151,6 @@ export default function Toolbar({ handleCustom, handleReset, custom }) {
                     id="demo-simple-select-standard"
                     value={range}
                     onChange={handleChange}
-                    label="Age"
                     sx={{ width: 350 }}
                 >
                     <MenuItem value={"default"}>
